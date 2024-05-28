@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Manager</title>
+    <style>
+        body {
+            background-image: url('C:\Users\hp\Desktop\A_6\html_code\templates\image.png');
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #options {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        form {
+            display: none;
+        }
+
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        #options h1 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="options">
+        <h1>Password Manager</h1>
+
+        <button id="storeButton">Store Password</button>
+        <button id="retrieveButton">Retrieve Password</button>
+
+        <form id="storeForm">
+            <h2>Store Password</h2>
+            <label for="domain">Domain Name:</label>
+            <input type="text" id="domain" required><br>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" required><br>
+
+            <label for="masterPassword">Master Password:</label>
+            <input type="password" id="masterPassword" required><br>
+
+            <button type="button" id="storePasswordButton">Store Password</button>
+        </form>
+
+        <form id="retrieveForm">
+            <h2>Retrieve Password</h2>
+            <label for="retrieveDomain">Domain Name:</label>
+            <input type="text" id="retrieveDomain" required><br>
+
+            <label for="retrieveMasterPassword">Master Password:</label>
+            <input type="password" id="retrieveMasterPassword" required><br>
+
+            <button type="button" id="retrievePasswordButton">Retrieve Password</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById('storeButton').addEventListener('click', showStorePassword);
+            document.getElementById('retrieveButton').addEventListener('click', showRetrievePassword);
+            document.getElementById('storePasswordButton').addEventListener('click', storePassword);
+            document.getElementById('retrievePasswordButton').addEventListener('click', retrievePassword);
+        });
+
+        function showStorePassword() {
+            document.getElementById('storeForm').style.display = 'block';
+            document.getElementById('retrieveForm').style.display = 'none';
+        }
+
+        function showRetrievePassword() {
+            document.getElementById('storeForm').style.display = 'none';
+            document.getElementById('retrieveForm').style.display = 'block';
+        }
+
+        async function storePassword() {
+            const domain = document.getElementById("domain").value;
+            const password = document.getElementById("password").value;
+            const masterPassword = document.getElementById("masterPassword").value;
+
+            const response = await fetch('/store_password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    domain,
+                    password,
+                    masterPassword,
+                }),
+            });
+
+            const result = await response.json();
+            alert(result.message);
+        }
+
+        async function retrievePassword() {
+            const retrieveDomain = document.getElementById("retrieveDomain").value;
+            const retrieveMasterPassword = document.getElementById("retrieveMasterPassword").value;
+
+            const response = await fetch('/retrieve_password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    domain: retrieveDomain,
+                    masterPassword: retrieveMasterPassword,
+                }),
+            });
+
+            const result = await response.json();
+            if (result.error) {
+                alert(result.error);
+            } else {
+                alert(`Password for ${retrieveDomain} is: ${result.password}`);
+            }
+        }
+    </script>
+
+</body>
+</html>
